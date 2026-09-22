@@ -1,0 +1,1 @@
+import{NoteEditor}from"@/components/note-editor";import{notes}from"@/lib/mock-data";export default async function Page({params}:{params:Promise<{id:string}>}){const{id}=await params;const n=notes.find(x=>x.id===id)??notes[0];return <NoteEditor title={n.title} body={n.body}/>}
