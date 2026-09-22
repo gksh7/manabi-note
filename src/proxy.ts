@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) return NextResponse.next();
 
   let response = NextResponse.next({ request });
@@ -19,7 +19,8 @@ export async function proxy(request: NextRequest) {
   });
   const { data: { user } } = await supabase.auth.getUser();
   const isLogin = request.nextUrl.pathname === "/login";
-  if (!user && !isLogin) return NextResponse.redirect(new URL("/login", request.url));
+  const isAuthCallback = request.nextUrl.pathname.startsWith("/auth/confirm");
+  if (!user && !isLogin && !isAuthCallback) return NextResponse.redirect(new URL("/login", request.url));
   if (user && isLogin) return NextResponse.redirect(new URL("/notes", request.url));
   return response;
 }

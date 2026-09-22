@@ -1,2 +1,11 @@
-"use client";
-import{Check,UserRound}from"lucide-react";import{useState}from"react";export default function Page(){const[s,setS]=useState(false);return <div className="page-wrap narrow"><div className="page-heading"><div><span className="eyebrow">ACCOUNT</span><h1>プロフィール設定</h1><p>公開メモやコメントに表示される情報です。</p></div></div><form className="profile-form" onSubmit={e=>{e.preventDefault();setS(true)}}><div className="profile-avatar"><span className="avatar large"><UserRound/></span><button type="button" className="button secondary">画像を変更</button></div><label>表示名<input defaultValue="sakura"/></label><label>メールアドレス<input type="email" defaultValue="sakura@example.com" disabled/></label><label>自己紹介<textarea defaultValue="学んだことを自分の言葉で残しています。"/></label><label>関心のあるトピック<input defaultValue="プログラミング, デザイン, 読書"/></label><button className="button primary save-profile">{s&&<Check size={16}/>} {s?"保存しました":"保存する"}</button></form></div>}
+import { ProfileForm } from "@/components/profile-form";
+import { getProfile } from "@/lib/data";
+import { createClient } from "@/lib/supabase/server";
+
+export default async function ProfilePage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+  const profile = await getProfile(supabase, user.id);
+  return <div className="page-wrap narrow"><div className="page-heading"><div><span className="eyebrow">ACCOUNT</span><h1>プロフィール設定</h1><p>公開メモやコメントに表示される情報です。</p></div></div><ProfileForm email={user.email ?? ""} displayName={profile?.display_name ?? ""} bio={profile?.bio ?? ""} /></div>;
+}

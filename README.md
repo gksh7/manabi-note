@@ -29,3 +29,13 @@ npm run dev
 
 - [開発計画](./PROJECT_PLAN.md)
 - デザイン資料: `docs/design/`（ステップ1で作成）
+
+## E2E テスト
+
+`SUPABASE_TEST_EMAIL` と `SUPABASE_TEST_PASSWORD` に専用テストアカウントを設定してから、次を実行します。
+
+```bash
+npm run test:e2e
+```
+
+テストは公開メモを作成し、コメント・編集を確認した後に削除します。
