@@ -1,1 +1,5 @@
-import{NoteEditor}from"@/components/note-editor";export default function Page(){return <NoteEditor/>}
+import { NoteEditor } from "@/components/note-editor";
+
+export default function NewNotePage() {
+  return <NoteEditor />;
+}

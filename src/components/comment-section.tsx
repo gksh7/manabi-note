@@ -1,3 +1,14 @@
 "use client";
-import{Send}from"lucide-react";import{FormEvent,useState}from"react";
-export function CommentSection(){const[items,setItems]=useState([{id:1,author:"sakura",body:"とても分かりやすいです。参考になりました！",time:"1日前"},{id:2,author:"takumi",body:"実際に手を動かしてみるのが一番ですね。",time:"2日前"}]);const[body,setBody]=useState("");function submit(e:FormEvent){e.preventDefault();if(!body.trim())return;setItems([{id:Date.now(),author:"あなた",body:body.trim(),time:"たった今"},...items]);setBody("")}return <section className="comments"><h2>コメント <span>{items.length}</span></h2><form onSubmit={submit}><input value={body} onChange={e=>setBody(e.target.value)} placeholder="コメントを入力"/><button className="button primary" disabled={!body.trim()}><Send size={16}/>送信</button></form><div className="comment-list">{items.map(c=><article key={c.id}><div className="avatar small">{c.author[0].toUpperCase()}</div><div><div className="comment-meta"><strong>{c.author}</strong><span>{c.time}</span></div><p>{c.body}</p></div></article>)}</div></section>}
+
+import { Send } from "lucide-react";
+import { useActionState } from "react";
+import { addComment, type FormState } from "@/app/actions/notes";
+import { formatDate, type Comment } from "@/lib/data";
+
+const initialState: FormState = {};
+
+export function CommentSection({ noteId, comments }: { noteId: string; comments: Comment[] }) {
+  const [state, formAction, pending] = useActionState(addComment, initialState);
+
+  return <section className="comments"><h2>コメント <span>{comments.length}</span></h2><form action={formAction}><input type="hidden" name="noteId" value={noteId} /><input name="body" placeholder="コメントを入力" maxLength={1000} required /><button className="button primary" disabled={pending}><Send size={16} />{pending ? "送信中..." : "送信"}</button></form>{state.message && <p className="form-error" aria-live="polite">{state.message}</p>}<div className="comment-list">{comments.map((comment) => <article key={comment.id}><div className="avatar small">{comment.author[0]?.toUpperCase()}</div><div><div className="comment-meta"><strong>{comment.author}</strong><span>{formatDate(comment.createdAt)}</span></div><p>{comment.body}</p></div></article>)}</div></section>;
+}

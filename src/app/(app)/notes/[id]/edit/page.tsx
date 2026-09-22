@@ -1,1 +1,13 @@
-import{NoteEditor}from"@/components/note-editor";import{notes}from"@/lib/mock-data";export default async function Page({params}:{params:Promise<{id:string}>}){const{id}=await params;const n=notes.find(x=>x.id===id)??notes[0];return <NoteEditor title={n.title} body={n.body}/>}
+import { notFound } from "next/navigation";
+import { NoteEditor } from "@/components/note-editor";
+import { getNote } from "@/lib/data";
+import { createClient } from "@/lib/supabase/server";
+
+export default async function EditNotePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const note = await getNote(supabase, id);
+  if (!user || !note || note.userId !== user.id) notFound();
+  return <NoteEditor note={note} allowDelete />;
+}

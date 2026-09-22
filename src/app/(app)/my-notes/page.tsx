@@ -1,3 +1,11 @@
-"use client";
-import{Search}from"lucide-react";import Link from"next/link";import{useState}from"react";import{NoteCard}from"@/components/note-card";import{notes}from"@/lib/mock-data";
-export default function MyNotes(){const[s,setS]=useState("すべて");const list=notes.filter(n=>s==="すべて"||(s==="公開"?n.isPublic:!n.isPublic));return <div className="page-wrap"><div className="page-heading"><div><span className="eyebrow">MY LIBRARY</span><h1>マイメモ</h1><p>考えたこと、覚えておきたいことを整理します。</p></div><Link className="button primary" href="/notes/new">新しいメモ</Link></div><div className="toolbar"><label className="search"><Search size={17}/><input placeholder="自分のメモを検索"/></label></div><div className="filter-tabs">{["すべて","公開","非公開"].map(x=><button key={x} className={s===x?"selected":""} onClick={()=>setS(x)}>{x}</button>)}</div><section className="note-list">{list.map(n=><NoteCard owner key={n.id} note={n}/>)}</section></div>}
+import { MyNotesList } from "@/components/my-notes-list";
+import { getOwnNotes } from "@/lib/data";
+import { createClient } from "@/lib/supabase/server";
+
+export default async function MyNotesPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+  const notes = await getOwnNotes(supabase, user.id);
+  return <MyNotesList notes={notes} />;
+}
